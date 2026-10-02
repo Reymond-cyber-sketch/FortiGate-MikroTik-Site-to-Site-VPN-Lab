@@ -1,0 +1,144 @@
+COMANDOS DE PRUEBA DEL LABORATORIO
+==================================
+
+
+1. OBTENER DIRECCION IP POR DHCP EN USER-PC
+
+udhcpc -i eth0 -q -n
+
+
+2. VERIFICAR DIRECCION IP ASIGNADA
+
+ip addr show eth0
+
+
+3. PROBAR CONECTIVIDAD CON EL GATEWAY DEL FORTIGATE
+
+ping -c 4 10.24.96.1
+
+
+4. PROBAR CONECTIVIDAD CON EL WEB-SERVER A TRAVES DE LA VPN
+
+ping -c 4 10.24.96.130
+
+
+5. PROBAR EL SERVICIO HTTPS DEL WEB-SERVER
+
+curl -k https://10.24.96.130/
+
+
+6. VERIFICAR LA RUTA HACIA EL WEB-SERVER
+
+traceroute 10.24.96.130
+
+
+RESULTADO ESPERADO CON VPN ACTIVA
+=================================
+
+El USER-PC debe comunicarse con el WEB-SERVER.
+
+Ejemplo:
+
+4 packets transmitted
+4 packets received
+0% packet loss
+
+El servidor HTTPS debe responder con la pagina:
+
+WEB SERVER - Laboratorio FortiGate
+
+Servidor HTTPS funcionando correctamente.
+
+IP: 10.24.96.130
+
+
+PRUEBA CON VPN INACTIVA
+=======================
+
+Desactivar temporalmente el peer IPsec en VPN-PEER:
+
+/ip ipsec peer disable [find name="FGT-USER"]
+
+Eliminar las sesiones IPsec activas:
+
+/ip ipsec active-peers kill-connections
+
+/ip ipsec installed-sa flush
+
+
+Desde USER-PC ejecutar:
+
+ping -c 4 10.24.96.130
+
+
+RESULTADO ESPERADO:
+
+4 packets transmitted
+0 packets received
+100% packet loss
+
+
+REACTIVAR LA VPN
+================
+
+En VPN-PEER ejecutar:
+
+/ip ipsec peer enable [find name="FGT-USER"]
+
+
+Generar nuevamente trafico desde USER-PC:
+
+ping -c 4 10.24.96.130
+
+
+RESULTADO ESPERADO:
+
+4 packets transmitted
+4 packets received
+0% packet loss
+
+
+VERIFICAR IPSEC EN MIKROTIK
+===========================
+
+/ip ipsec active-peers print
+
+/ip ipsec installed-sa print
+
+/ip ipsec policy print
+
+
+WEB-SERVER
+==========
+
+IP:
+10.24.96.130/28
+
+Gateway:
+10.24.96.129
+
+
+USER-PC
+=======
+
+Red:
+10.24.96.0/25
+
+Gateway:
+10.24.96.1
+
+Asignacion IP:
+DHCP
+
+
+RESUMEN DE LA PRUEBA
+====================
+
+VPN ACTIVA:
+USER-PC -> WEB-SERVER = FUNCIONA
+
+VPN INACTIVA:
+USER-PC -> WEB-SERVER = NO FUNCIONA
+
+VPN REACTIVADA:
+USER-PC -> WEB-SERVER = FUNCIONA NUEVAMENTE
