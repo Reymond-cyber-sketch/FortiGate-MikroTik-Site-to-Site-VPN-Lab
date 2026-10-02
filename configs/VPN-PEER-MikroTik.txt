@@ -1,0 +1,114 @@
+MIKROTIK - VPN-PEER
+===================
+
+IDENTIDAD
+
+Nombre del equipo:
+VPN-PEER
+
+
+INTERFACES
+
+WAN - ether1
+IP: 203.0.113.98/30
+Gateway: 203.0.113.97
+
+LAN WEB - ether2
+IP: 10.24.96.129/28
+
+
+DNS
+
+DNS 1: 8.8.8.8
+DNS 2: 1.1.1.1
+
+
+RUTA POR DEFECTO
+
+Destino:
+0.0.0.0/0
+
+Gateway:
+203.0.113.97
+
+
+NAT
+
+La red del servidor WEB utiliza NAT para acceso a Internet.
+
+Red:
+10.24.96.128/28
+
+Salida:
+ether1
+
+Acción:
+masquerade
+
+
+NO NAT HACIA LA VPN
+
+Origen:
+10.24.96.128/28
+
+Destino:
+10.24.96.0/25
+
+Acción:
+accept
+
+
+VPN SITE-TO-SITE IPSEC
+
+Peer:
+FGT-USER
+
+Remote Peer:
+198.51.100.98
+
+Exchange Mode:
+IKEv2
+
+Local Network:
+10.24.96.128/28
+
+Remote Network:
+10.24.96.0/25
+
+Encryption:
+DES
+
+Authentication:
+SHA256
+
+DH Group:
+modp2048 / Group 14
+
+PFS:
+Disabled
+
+Pre-Shared Key:
+<IPSEC_PSK_REDACTED>
+
+
+COMANDOS PRINCIPALES UTILIZADOS
+
+/ip address add address=203.0.113.98/30 interface=ether1 comment="WAN hacia ISP"
+
+/ip address add address=10.24.96.129/28 interface=ether2 comment="LAN WEB"
+
+/ip route add dst-address=0.0.0.0/0 gateway=203.0.113.97
+
+/ip dns set servers=8.8.8.8,1.1.1.1 allow-remote-requests=yes
+
+/ip firewall nat add chain=srcnat src-address=10.24.96.128/28 dst-address=10.24.96.0/25 action=accept comment="NO NAT hacia VPN"
+
+/ip firewall nat add chain=srcnat src-address=10.24.96.128/28 out-interface=ether1 action=masquerade comment="NAT WEB hacia Internet"
+
+/ip ipsec profile add name=FGT-IKE2 hash-algorithm=sha256 enc-algorithm=des dh-group=modp2048
+
+/ip ipsec proposal add name=FGT-P2 auth-algorithms=sha256 enc-algorithms=des pfs-group=none
+
+/ip ipsec peer add name=FGT-USER address=198.51.100.98/32 exchange-mode=ike2 profile=FGT-IKE2
+
+/ip ipsec policy add src-address=10.24.96.128/28 dst-address=10.24.96.0/25 tunnel=yes action=encrypt peer=FGT-USER proposal=FGT-P2
