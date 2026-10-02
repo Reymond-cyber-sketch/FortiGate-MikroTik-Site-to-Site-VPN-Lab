@@ -1,0 +1,100 @@
+MIKROTIK - ISP
+==============
+
+IDENTIDAD
+
+Nombre del equipo:
+ISP
+
+
+INTERFACES
+
+HACIA FGT-USER
+Interface: ether7
+IP: 198.51.100.97/30
+
+HACIA VPN-PEER
+Interface: ether8
+IP: 203.0.113.97/30
+
+HACIA INTERNET / GNS3 NAT
+Interface: ether10
+Configuración: DHCP Client
+
+
+REDES PUBLICAS UTILIZADAS
+
+Red entre ISP y FGT-USER:
+198.51.100.96/30
+
+ISP:
+198.51.100.97
+
+FGT-USER:
+198.51.100.98
+
+
+Red entre ISP y VPN-PEER:
+203.0.113.96/30
+
+ISP:
+203.0.113.97
+
+VPN-PEER:
+203.0.113.98
+
+
+INTERNET
+
+La interfaz ether10 obtiene una dirección IP
+mediante DHCP desde el nodo NAT de GNS3.
+
+Ejemplo utilizado durante el laboratorio:
+
+IP recibida:
+192.168.42.44/24
+
+Gateway:
+192.168.42.1
+
+
+NAT
+
+El ISP utiliza masquerade hacia la interfaz
+de salida a Internet.
+
+Interface de salida:
+ether10
+
+Acción:
+masquerade
+
+
+COMANDOS PRINCIPALES UTILIZADOS
+
+/ip address add address=198.51.100.97/30 interface=ether7 comment="WAN hacia FGT-USER"
+
+/ip address add address=203.0.113.97/30 interface=ether8 comment="WAN hacia VPN-PEER"
+
+/ip dhcp-client add interface=ether10 add-default-route=yes use-peer-dns=yes disabled=no
+
+/ip firewall nat add chain=srcnat out-interface=ether10 action=masquerade
+
+
+FUNCION DEL ISP
+
+El dispositivo ISP simula el proveedor de Internet
+entre ambos extremos de la VPN.
+
+Su función principal es permitir conectividad entre:
+
+FGT-USER
+198.51.100.98/30
+
+y
+
+VPN-PEER
+203.0.113.98/30
+
+Además proporciona salida a Internet mediante
+el nodo NAT de GNS3.
