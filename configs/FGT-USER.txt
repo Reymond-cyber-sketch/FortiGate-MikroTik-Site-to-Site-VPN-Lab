@@ -1,0 +1,53 @@
+FORTIGATE - FGT-USER
+====================
+
+INTERFACES
+
+WAN - port1
+IP: 198.51.100.98/30
+Gateway: 198.51.100.97
+
+USERS - port2
+IP: 10.24.96.1/25
+
+MGMT - port3
+IP: 192.168.178.2/24
+
+
+DHCP - RED DE USUARIOS
+
+Network: 10.24.96.0/25
+Gateway: 10.24.96.1
+Range: 10.24.96.10 - 10.24.96.120
+DNS 1: 8.8.8.8
+DNS 2: 1.1.1.1
+
+
+VPN SITE-TO-SITE
+
+Tunnel Name: VPN-TO-WEB
+Remote Gateway: 203.0.113.98
+
+Local Network:
+10.24.96.0/25
+
+Remote Network:
+10.24.96.128/28
+
+IKE Version: IKEv2
+Encryption: DES
+Authentication: SHA256
+DH Group: 14
+PFS: Disabled
+
+Pre-Shared Key:
+<IPSEC_PSK_REDACTED>
+
+
+NAT
+
+La red de usuarios utiliza NAT para acceso a Internet.
+
+El tráfico dirigido a la red remota
+10.24.96.128/28 no utiliza NAT y es enviado
+mediante el túnel VPN IPsec.
